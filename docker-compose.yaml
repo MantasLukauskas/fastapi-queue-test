@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+      - "8002:8002"
+    depends_on:
+      - redis
+    command: gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8000
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - app
